@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Complaint Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #4a5568;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .complaints-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .complaints-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            background: #f8fafc;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .complaint-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .complaint-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .complaint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .complaint-info {
+            flex-grow: 1;
+        }
+
+        .complaint-subject {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .complaint-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .complaint-user {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .complaint-description {
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .complaint-image {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .complaint-image img {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .complaint-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .complaint-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resolve-btn {
+            background: #d1fae5;
+            color: #065f46;
+            border: none;
+        }
+
+        .resolve-btn:hover {
+            background: #6ee7b7;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background: #fca5a5;
+        }
+
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            .complaint-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .complaint-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Admin Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="welcome-section">
+            <h2>Welcome Back, Admin!</h2>
+            <p>Manage and track all user complaints</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <i class="fas fa-file-alt stat-icon"></i>
+                <div class="stat-value" id="total-complaints">0</div>
+                <div class="stat-label">Total Complaints</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock stat-icon"></i>
+                <div class="stat-value" id="pending-complaints">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle stat-icon"></i>
+                <div class="stat-value" id="resolved-complaints">0</div>
+                <div class="stat-label">Resolved</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users stat-icon"></i>
+                <div class="stat-value" id="total-users">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+
+        <div class="complaints-section">
+            <div class="section-header">
+                <h2>All Complaints</h2>
+                <div class="filters-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-complaints" placeholder="Search complaints...">
+                    </div>
+                    <select class="sort-select" id="sort-complaints">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="pending">Pending</button>
+                        <button class="filter-btn" data-filter="resolved">Resolved</button>
+                    </div>
+                </div>
+            </div>
+            <div id="complaints-container">
+                <!-- Complaints will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add modal for image preview -->
+    <div class="modal" id="imageModal">
+        <div class="modal-close" onclick="closeModal()">×</div>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Complaint Image">
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/admin-dashboard');
+                if (!response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                window.location.href = '/';
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await fetch('/api/logout');
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        // Get user initials
+        function getInitials(username) {
+            return username
+                .split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase();
+        }
+
+        // Load complaints
+        async function loadComplaints(filter = 'all') {
+            try {
+                const response = await fetch('/api/admin/complaints');
+                const complaints = await response.json();
+                
+                // Update stats
+                const totalComplaints = complaints.length;
+                const pendingComplaints = complaints.filter(c => c.status === 'pending').length;
+                const resolvedComplaints = complaints.filter(c => c.status === 'resolved').length;
+
+                document.getElementById('total-complaints').textContent = totalComplaints;
+                document.getElementById('pending-complaints').textContent = pendingComplaints;
+                document.getElementById('resolved-complaints').textContent = resolvedComplaints;
+
+                // Display complaints
+                const container = document.getElementById('complaints-container');
+                container.innerHTML = '';
+
+                const filteredComplaints = complaints.filter(complaint => 
+                    filter === 'all' || complaint.status === filter
+                );
+
+                if (filteredComplaints.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>No complaints found</h3>
+                            <p>There are no complaints matching your current filter</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                filteredComplaints.forEach(complaint => {
+                    const complaintElement = document.createElement('div');
+                    complaintElement.className = 'complaint-item';
+                    complaintElement.innerHTML = `
+                        <div class="complaint-header">
+                            <div class="complaint-info">
+                                <div class="complaint-subject">${complaint.subject}</div>
+                                <div class="complaint-meta">
+                                    <div class="complaint-user">
+                                        <div class="user-avatar">${getInitials(complaint.username)}</div>
+                                        <span>${complaint.username}</span>
+                                    </div>
+                                    <div>
+                                        <i class="far fa-clock"></i>
+                                        ${formatDate(complaint.createdAt)}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="status ${complaint.status}">${complaint.status}</span>
+                        </div>
+                        <div class="complaint-description">${complaint.description}</div>
+                        ${complaint.image ? `
+                            <div class="complaint-image">
+                                <img src="/uploads/${complaint.image}" alt="Complaint Image" onclick="openModal('/uploads/${complaint.image}')">
+                            </div>
+                        ` : ''}
+                        <div class="complaint-actions">
+                            ${complaint.status === 'pending' ? `
+                                <button class="action-btn resolve-btn" onclick="resolveComplaint('${complaint._id}')">
+                                    <i class="fas fa-check"></i> Mark as Resolved
+                                </button>
+                            ` : ''}
+                            <button class="action-btn delete-btn" onclick="deleteComplaint('${complaint._id}')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(complaintElement);
+                });
+            } catch (error) {
+                console.error('Error loading complaints:', error);
+            }
+        }
+
+        // Resolve complaint
+        async function resolveComplaint(complaintId) {
+            try {
+                const response = await fetch(`/api/admin/complaints/${complaintId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'resolved' })
+                });
+
+                if (response.ok) {
+                    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                    loadComplaints(activeFilter);
+                }
+            } catch (error) {
+                console.error('Error resolving complaint:', error);
+            }
+        }
+
+        // Delete complaint
+        async function deleteComplaint(complaintId) {
+            if (confirm('Are you sure you want to delete this complaint?')) {
+                try {
+                    const response = await fetch(`/api/admin/complaints/${complaintId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                        loadComplaints(activeFilter);
+                    }
+                } catch (error) {
+                    console.error('Error deleting complaint:', error);
+                }
+            }
+        }
+
+        // Filter buttons functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                loadComplaints(button.dataset.filter);
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('search-complaints');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const complaints = document.querySelectorAll('.complaint-item');
+            
+            complaints.forEach(complaint => {
+                const subject = complaint.querySelector('.complaint-subject').textContent.toLowerCase();
+                const description = complaint.querySelector('.complaint-description').textContent.toLowerCase();
+                const username = complaint.querySelector('.complaint-user span').textContent.toLowerCase();
+                
+                if (subject.includes(searchTerm) || 
+                    description.includes(searchTerm) || 
+                    username.includes(searchTerm)) {
+                    complaint.style.display = '';
+                } else {
+                    complaint.style.display = 'none';
+                }
+            });
+        });
+
+        // Image modal functions
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modal.classList.add('active');
+            
+            // Close modal when clicking outside the image
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal with escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initial load
+        checkAuth();
+        loadComplaints();
+    </script>
+</body>
+</html> 
